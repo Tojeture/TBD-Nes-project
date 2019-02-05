@@ -119,7 +119,7 @@ Loadnames:
  STA Sprite1_T
  STA Sprite2_T
  STA Sprite1_S
- LDA #%00000001
+ LDA #%00000001 ; set the second palette for the second player
  STA Sprite2_S
  ; Screen scrolling
  STA Vertical_scroll
@@ -127,12 +127,17 @@ Loadnames:
  
 ; MAIN LOOP
 update:
+ LDA #$00
+ LDX #$00
+ LDY #$00
+ 
  .include "include/checkground.asm"
  
  LDA Player_State
  AND #%00000001 ; Check if the player is grounded
  BNE skipgravity
  ; first check if the Y value + acceleration is still colliding if so remove 1
+ CLC
  LDA Sprite1_Y
  ADC #1
  STA Sprite1_Y
@@ -146,10 +151,10 @@ skipgravity:
  LDA INITIAL_POSITION_Y
  STA Sprite1_Y
 skipresetposition:
- 
+
  JSR keypressed
  
-WaitForVBlank: 
+WaitForVBlank:
  LDA VBlankOrNo
  CMP #1
  BNE WaitForVBlank
@@ -160,27 +165,6 @@ WaitForVBlank:
  STA $2005
  LDA Vertical_scroll
  STA $2005
- 
- 
- ; LDA Sprite1_Y
- ; STA $2004
- ; LDA #00
- ; STA $2004
- ; STA $2004
- ; LDA Sprite1_X
- ; STA $2004
- 
- ; player 2 test
- ; LDA #$04
- ; STA $4014
- ; LDA #$9F
- ; STA $2004
- ; LDA #01
- ; STA $2004
- ; STA $2004
- ; LDA Sprite1_X
- ; STA $2004
- 
  jmp update ; infinite loop
  
  ; From bank of interuption lead to this function first before the Start
@@ -200,7 +184,6 @@ keypressed:
  LDA #$00
  STA JOYPAD1
  
- 
  LDA JOYPAD1 ;A
  LDA JOYPAD1 ;B
  LDA JOYPAD1 ;SELECT
@@ -216,6 +199,7 @@ readupkey:
  LDA JOYPAD1
  AND #1
  BEQ readkeydone
+ SEC
  LDA Sprite1_Y
  SBC #1
  STA Sprite1_Y
@@ -236,6 +220,10 @@ readleftkey:
  LDA JOYPAD1
  AND #1
  BEQ readkeydone
+ LDA Sprite1_S ; Transform to subroutines
+ ORA #%01000000
+ STA Sprite1_S
+ SEC
  LDA Sprite1_X
  SBC #1
  STA Sprite1_X
@@ -246,6 +234,10 @@ readrightkey:
  LDA JOYPAD1
  AND #1
  BEQ readkeydone
+ LDA Sprite1_S
+ AND #%10111111
+ STA Sprite1_S
+ CLC
  LDA Sprite1_X
  ADC #1
  STA Sprite1_X

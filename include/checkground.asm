@@ -1,8 +1,8 @@
 ; Sprite hitbox and collision detection
- ; Specify hitbox values by adding 8 pixel to the x and y location
+ ; Specify hitbox values by adding 8 pixel to the x and y location ( SUBJECT TO CHANGE)
  CLC
  LDA Sprite1_X
- ADC #8
+ ADC #7
  STA Sprite1_X_prime
  CLC
  LDA Sprite1_Y
@@ -13,8 +13,9 @@
  ; X and Y_prime give the bottom-left hitbox
  ; Check if this hitbox collide with floor with collide data
  ; Convert this hitbox X and Y into collmap format, 4x30
+ CLC
  LDA Sprite1_Y_prime
- ADC #2
+ ADC #2 ; When rendered the Y position is 1 pixel above the sprite
  LSR A
  LSR A
  LSR A ; Divide by 8
