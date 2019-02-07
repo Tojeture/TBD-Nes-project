@@ -135,6 +135,7 @@ update:
  ; check if character is in the grounded
  JSR CheckIfInGround
  
+ ;JMP skipgravity ; TODO remove test of gravity
  LDA Player_State
  AND #%00000001 ; Check if the player is grounded
  BNE skipgravity
@@ -177,7 +178,8 @@ palette:
  .incbin "palette.pal"
 Map:
  .incbin "map.nam"
- 
+Attributes:
+ .incbin "map_attr.atr"
 Text: .db "Hello",0
 BitMasks:
    .db %10000000

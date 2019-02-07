@@ -12,6 +12,7 @@ function toBits(num,bits)
 	end
     return st
 end
+
 while(true) do
 	p1x = memory.readbyte(0x0303);
 	p1y = memory.readbyte(0x0300);
@@ -20,6 +21,5 @@ while(true) do
 	gui.text(141,224,"Player_state: "..p1status);
 	gui.line(0,p1y,255,p1y);
 	gui.line(p1x,0,p1x,255);
-	
 	emu.frameadvance();
 end;

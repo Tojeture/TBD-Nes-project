@@ -2,7 +2,9 @@
  ; Specify hitbox(pixel) values to be tested if it touches the ground
 CheckGround: ; Checkground subroutines
  ; Check the left side
+ CLC
  LDA Sprite1_X
+ ADC #2
  STA Sprite1_X_prime
  CLC
  LDA Sprite1_Y  ; When rendered the Y position is 1 pixel above the sprite
@@ -106,9 +108,9 @@ SkipCheckIfInGround:
 ; Wall subroutines
  ; detection of wall on both side with side-hitbox
 CheckLeftCollision
- SEC
+ CLC
  LDA Sprite1_X
- SBC #1
+ ADC #1
  STA Sprite1_X_prime
  CLC
  LDA Sprite1_Y
