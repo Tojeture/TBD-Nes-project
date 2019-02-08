@@ -104,7 +104,7 @@ Loadnames:
  LDA #$E6
  STA Death_Zone
  ; define Y position on init,sprite1,sprite2
- LDA #$26
+ LDA #$B6
  STA INITIAL_POSITION_Y
  STA Sprite1_Y
  STA Sprite2_Y

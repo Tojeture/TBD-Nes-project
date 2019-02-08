@@ -143,3 +143,5 @@ CheckRightCollision
  JSR CheckPixelCollision
 SkipRightCheck:
  RTS
+ 
+ ;TODO create subroutine to get all 4 corner of sprites
