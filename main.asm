@@ -20,15 +20,26 @@ JOYPAD2 = $4017
 ; Set variable before changing to programming code
  .org $0000
  VBlankOrNo: .db 0
+ ; Parameters
  L_byte: .db 0
  H_byte: .db 0
  Temp_X: .db 0
  Temp_Y: .db 0
- Death_Zone: .db 0
+ ; Constant
+ DEATH_ZONE: .db 0
  INITIAL_POSITION_X: .db 0
  INITIAL_POSITION_Y: .db 0
+ JUMP_FORCE: .db 0
+ JUMP_VELOCITY: .db 0
+ GRAVITY_FORCE: .db 0
+ GRAVITY_DELAY: .db 0
  ; Collision
  Player_State: .db 0
+ vertical_force: .db 0
+ jump_force_cur: .db 0
+ gravity_delay_cur: .db 0
+ gravity_force_cur: .db 0
+ jump_velocity_cur: .db 0
  ; Hitbox
  Sprite1_X_prime: .db 0
  Sprite1_Y_prime: .db 0
@@ -101,8 +112,22 @@ Loadnames:
  BNE Loadnames
 
  ;; INIT VARIABLES
+ LDA #$00
+ STA Player_State
+ STA vertical_force
+ ; Physics
+ LDA #$03
+ STA GRAVITY_FORCE
+ LDA #$01
+ STA JUMP_VELOCITY
+ LDA #$14
+ STA JUMP_FORCE
+ STA jump_force_cur
+ LDA #$08
+ STA GRAVITY_DELAY
+ STA gravity_delay_cur
  LDA #$E6
- STA Death_Zone
+ STA DEATH_ZONE
  ; define Y position on init,sprite1,sprite2
  LDA #$B6
  STA INITIAL_POSITION_Y
@@ -132,30 +157,23 @@ update:
  LDY #$00
  
  JSR CheckGround
- ; check if character is in the grounded
+ ; Check if character is in the grounded
  JSR CheckIfInGround
- 
- ;JMP skipgravity ; TODO remove test of gravity
- LDA Player_State
- AND #%00000001 ; Check if the player is grounded
- BNE skipgravity
- ; first check if the Y value + acceleration is still colliding if so remove 1
- CLC
- LDA Sprite1_Y
- ADC #3
- STA Sprite1_Y
-skipgravity:
+ ; Apply gravity
+ JSR ApplyGravity
+ ; Control input
+ JSR keypressed
+ ; ApplyVerticalForce
+ JSR ApplyVerticalForce
 
  LDA Sprite1_Y
- CMP Death_Zone
- BNE skipresetposition
+ CMP DEATH_ZONE
+ BNE SkipResetPosition
  LDA INITIAL_POSITION_X
  STA Sprite1_X
  LDA INITIAL_POSITION_Y
  STA Sprite1_Y
-skipresetposition:
-
- JSR keypressed
+SkipResetPosition:
  
 WaitForVBlank:
  LDA VBlankOrNo
@@ -170,17 +188,19 @@ WaitForVBlank:
  STA $2005
  jmp update ; infinite loop
 
+ .include "include/subroutines_gravity.asm"
  .include "include/subroutines_collision.asm"
  .include "include/subroutines.asm"
 
 ;; RESOURCES ;;
 palette:
  .incbin "palette.pal"
+; Map and attributes need to be the next 255 bytes
 Map:
  .incbin "map.nam"
 Attributes:
  .incbin "map_attr.atr"
-Text: .db "Hello",0
+
 BitMasks:
    .db %10000000
    .db %01000000

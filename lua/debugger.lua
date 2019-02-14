@@ -16,9 +16,13 @@ end
 while(true) do
 	p1x = memory.readbyte(0x0303);
 	p1y = memory.readbyte(0x0300);
-	p1status = toBits(memory.readbyte(0x0008),8);
+	vertical_force = memory.readbyte(0x000D);
+	jump_force = memory.readbyte(0x000E);
+	gravity_delay = memory.readbyte(0x000F);
+	p1status = toBits(memory.readbyte(0x000C),8);
 	gui.text(1,9,"P1: "..p1x..","..p1y);
 	gui.text(141,224,"Player_state: "..p1status);
+	gui.text(1,18,"Vforce:"..vertical_force.." Jforce:"..jump_force);
 	gui.line(0,p1y,255,p1y);
 	gui.line(p1x,0,p1x,255);
 	emu.frameadvance();

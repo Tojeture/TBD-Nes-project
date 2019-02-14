@@ -1,4 +1,5 @@
 # Ongoing - Assembly NES project
+
 ## Completed
 - Nes header and bank code
 - First couple of sprites
@@ -6,7 +7,10 @@
 - OAM reading in interupt
 - Movements and controller reading
 - First draft of collisions
-## Ongoing
+- Jump, movement and gravity
 - Ground check and collisions
 - Wall check and collisions
-- Jump, movement and gravity
+## Ongoing
+- First Attack ( double jump ?)
+- Characters redesign
+- Stage redesign
