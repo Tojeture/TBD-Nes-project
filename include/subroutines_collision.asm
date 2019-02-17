@@ -90,6 +90,7 @@ CheckIfInGround:
  BEQ SkipCheckIfInGround
  
  LDA Sprite1_X
+ ADC #2
  STA Sprite1_X_prime
  LDA Sprite1_Y
  ADC #9
@@ -114,7 +115,7 @@ CheckLeftCollision
  STA Sprite1_X_prime
  CLC
  LDA Sprite1_Y
- ADC #1 ; world position sync
+ ADC #2 ; world position sync
  STA Sprite1_Y_prime
  JSR CheckPixelCollision
  BNE SkipLeftCheck
@@ -133,7 +134,7 @@ CheckRightCollision
  STA Sprite1_X_prime
  CLC
  LDA Sprite1_Y
- ADC #1
+ ADC #2
  STA Sprite1_Y_prime
  JSR CheckPixelCollision
  BNE SkipRightCheck

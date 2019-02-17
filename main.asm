@@ -137,7 +137,7 @@ Loadnames:
  LDA #$40
  STA INITIAL_POSITION_X
  STA Sprite1_X
- LDA #$60
+ LDA #$48
  STA Sprite2_X
  ; define other sprite related variables
  LDA #$00
@@ -198,8 +198,8 @@ palette:
 ; Map and attributes need to be the next 255 bytes
 Map:
  .incbin "map.nam"
-Attributes:
- .incbin "map_attr.atr"
+;Attributes:
+ ;.incbin "map_attr.atr"
 
 BitMasks:
    .db %10000000
@@ -211,30 +211,30 @@ BitMasks:
    .db %00000010
    .db %00000001
 CollMap:
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03 ; 8th line
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03 ; 16th
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03
- .db $C0, $00, $00, $03 ; 24th
+ .db $CF, $FF, $FF, $FF
+ .db $C0, $00, $00, $0F
+ .db $C0, $00, $00, $0F
+ .db $C0, $00, $00, $0F 
+ .db $FF, $FF, $FF, $CF
+ .db $FC, $00, $23, $CF
+ .db $FC, $00, $23, $CF
+ .db $FC, $00, $20, $0F ; 8th line
+ .db $FC, $00, $22, $3F
+ .db $FC, $7F, $22, $23
+ .db $C0, $0C, $22, $23
+ .db $C0, $0C, $22, $23
+ .db $C0, $0C, $F2, $23 
+ .db $C0, $0C, $23, $E3
+ .db $C0, $0F, $20, $03
+ .db $C3, $FC, $20, $03 ; 16th
+ .db $C0, $0C, $FF, $F3
+ .db $C0, $0C, $30, $43
+ .db $C0, $0F, $30, $43
+ .db $FC, $0C, $33, $C7
+ .db $C0, $0C, $F0, $03
+ .db $C0, $0C, $00, $03
+ .db $C0, $0C, $00, $03
+ .db $C0, $0C, $00, $03 ; 24th
  .db $C3, $FF, $FF, $C3
  .db $C3, $FF, $FF, $C3
  .db $C3, $FF, $FF, $C3
