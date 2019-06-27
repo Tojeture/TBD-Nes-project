@@ -88,20 +88,28 @@ CheckIfInGround:
  LDA Player_State
  AND #%00000001
  BEQ SkipCheckIfInGround
- 
+ CLC
  LDA Sprite1_X
  ADC #2
  STA Sprite1_X_prime
+ CLC
  LDA Sprite1_Y
  ADC #9
  STA Sprite1_Y_prime
  JSR CheckPixelCollision
+ BNE IsInGround
+ CLC
+ LDA Sprite1_X
+ ADC #7
+ STA Sprite1_X_prime
+ JSR CheckPixelCollision
  BEQ SkipCheckIfInGround
+IsInGround:
  SEC
  LDA Sprite1_Y
  SBC #1 ; Go up one sprite until it is back on ground
  STA Sprite1_Y
- 
+ JMP CheckIfInGround
 SkipCheckIfInGround:
  RTS
 
@@ -145,4 +153,22 @@ CheckRightCollision
 SkipRightCheck:
  RTS
  
- ;TODO create subroutine to get all 4 corner of sprites
+CheckUpCollision
+ CLC
+ LDA Sprite1_X
+ ADC #2
+ STA Sprite1_X_prime
+ CLC
+ LDA Sprite1_Y
+ ADC #2
+ STA Sprite1_Y_prime
+ JSR CheckPixelCollision
+ BNE SkipUpCheck
+ LDA Sprite1_X
+ ADC #7 ; upright character pixel
+ STA Sprite1_X_prime
+ JSR CheckPixelCollision
+SkipUpCheck:
+ RTS
+ 
+;TODO create subroutine to get all 4 corner of sprites

@@ -1,5 +1,12 @@
 ; Every frame we apply a vertical_force on the Y position.
 ApplyVerticalForce:
+ JSR CheckUpCollision
+ BEQ SkipNullVertical
+ LDA #1
+ STA vertical_force
+ LDA #0
+ STA jump_force_cur
+SkipNullVertical:
  CLC
  LDA Sprite1_Y
  ADC vertical_force
