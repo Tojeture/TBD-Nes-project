@@ -60,7 +60,6 @@ JOYPAD2 = $4017
  Sprite2_S: .db $00 ;0306 (flip,color)
  Sprite2_X: .db $00 ;0307 X position
  
- 
  .org $8000
 
 ; Config ppu with one byte stored in the 2 ppu control register at $2000 & $2001 ( Start right after org $8000 for cpu programming)
@@ -165,7 +164,7 @@ update:
  JSR keypressed
  ; ApplyVerticalForce
  JSR ApplyVerticalForce
-
+ 
  LDA Sprite1_Y
  CMP DEATH_ZONE
  BNE SkipResetPosition

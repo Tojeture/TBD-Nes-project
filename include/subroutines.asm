@@ -56,8 +56,9 @@ ReadBButton:
  LDA JOYPAD1
  AND #1
  BEQ ReadABDone
- LDA #$10
- STA jump_force_cur
+ LDA Vertical_scroll
+ ADC #1
+ STA Vertical_scroll
  JMP ReadABDone
  
 ReadABDone:
