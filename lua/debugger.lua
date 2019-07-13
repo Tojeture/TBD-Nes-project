@@ -14,6 +14,9 @@ function toBits(num,bits)
 end
 
 while(true) do
+	nt = memory.readbyte(0x0003);
+	scroll = memory.readbyte(0x0015);
+	
 	p1x = memory.readbyte(0x0303);
 	p1y = memory.readbyte(0x0300);
 	vertical_force = memory.readbyte(0x000D);
@@ -21,7 +24,8 @@ while(true) do
 	gravity_delay = memory.readbyte(0x000F);
 	p1status = toBits(memory.readbyte(0x000C),8);
 	gui.text(1,9,"P1: "..p1x..","..p1y);
-	gui.text(141,224,"Player_state: "..p1status);
+	-- gui.text(141,224,"Player_state: "..p1status);
+	gui.text(2,224,"nt:"..nt.." scroll:"..scroll);
 	gui.text(1,18,"Vforce:"..vertical_force.." Jforce:"..jump_force);
 	gui.line(0,p1y,255,p1y);
 	gui.line(p1x,0,p1x,255);

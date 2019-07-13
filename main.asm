@@ -2,9 +2,10 @@
  .inesprg 1 ; one (1) bank of program code
  .ineschr 1 ; one (1) bank of picture data
  .inesmap 0 ; we use mapper 0
- .inesmir 1 ; Mirror setting always 1.
+ .inesmir 0 ; Mirror setting always 1.
 
-; Constant
+; Address Constant
+PPU_ADDR = $2006
 JOYPAD1 = $4016
 JOYPAD2 = $4017
 
@@ -20,32 +21,32 @@ JOYPAD2 = $4017
 ; Set variable before changing to programming code
  .org $0000
  VBlankOrNo: .db 0
- ; Parameters
- L_byte: .db 0
- H_byte: .db 0
+ ; RENDERING
+ swapEnabled: .db 0
+ worldRowValue: .db 0
+ worldRowValueChanged: .db 0
+ nametable: .db 0
+ columnNumber: .db 0
+ low_ppu_addr: .db 0
+ high_ppu_addr: .db 0
+ low_map: .db 0
+ high_map: .db 0
+ low_row: .db 0
+ high_row: .db 0
  Temp_X: .db 0
  Temp_Y: .db 0
- ; Constant
- DEATH_ZONE: .db 0
- INITIAL_POSITION_X: .db 0
- INITIAL_POSITION_Y: .db 0
- JUMP_FORCE: .db 0
- JUMP_VELOCITY: .db 0
- GRAVITY_FORCE: .db 0
- GRAVITY_DELAY: .db 0
- ; Collision
+ ; COLLISION
  Player_State: .db 0
  vertical_force: .db 0
  jump_force_cur: .db 0
  gravity_delay_cur: .db 0
  gravity_force_cur: .db 0
  jump_velocity_cur: .db 0
- ; Hitbox
+ ; HITBOX
  Sprite1_X_prime: .db 0
  Sprite1_Y_prime: .db 0
- ; Scroll
- Vertical_scroll: .db 0
- Horizontal_scroll: .db 0
+ ; SCROLL
+ scroll: .db 0
  .org $0300
  ;; OAM informations for sprite rendering
  ; Render info
@@ -61,7 +62,14 @@ JOYPAD2 = $4017
  Sprite2_X: .db $00 ;0307 X position
  
  .org $8000
-
+ ; Value Constant
+ DEATH_ZONE: .db $E6
+ INITIAL_POSITION_X: .db $40
+ INITIAL_POSITION_Y: .db $B6
+ JUMP_FORCE: .db $14
+ JUMP_VELOCITY: .db $01
+ GRAVITY_FORCE: .db $03
+ GRAVITY_DELAY: .db $08
 ; Config ppu with one byte stored in the 2 ppu control register at $2000 & $2001 ( Start right after org $8000 for cpu programming)
 Start:
  ;; NES CONFIG
@@ -84,59 +92,52 @@ loadpal:
  INX
  CPX #32
  BNE loadpal
-
-; MAP
- LDA $2002
- LDA #$20
- STA $2006
- LDA #$00
- STA $2006
  
- LDA #LOW(Map)
- STA L_byte
- LDA #HIGH(Map)
- STA H_byte
- 
- LDY #$00
- LDX #$00
-Loadnames:
- LDA [L_byte], Y
- STA $2007
- INY
- CPY #$00
- BNE Loadnames
- INC H_byte
- INX
- CPX #$04
- BNE Loadnames
-
- ;; INIT VARIABLES
+ ; INIT MAP
  LDA #$00
- STA Player_State
- STA vertical_force
+ STA nametable
+ LDA #$EF
+ STA scroll
+ LDA #$5D
+ STA worldRowValue
+ 
+InitNametablesRendering:
+ JSR DrawNewRow
+ SEC
+ LDA scroll
+ SBC #$08
+ STA scroll
+ 
+ DEC worldRowValue
+ LDA worldRowValue
+ CMP #$3F
+ BNE InitNametablesRendering
+ ; Draw one more rows outside the screen in the buffering seam
+ LDA #$02
+ STA nametable
+ LDA #$EF
+ STA scroll
+ DEC worldRowValue
+ DEC worldRowValue					;Decrease another because 23A0 to 23C0 is not drawn, instead it is used for something else
+ JSR DrawNewRow
+ LDA #$00
+ STA nametable
+ 
+ 
+ ; INIT VARIABLES
  ; Physics
- LDA #$03
- STA GRAVITY_FORCE
- LDA #$01
- STA JUMP_VELOCITY
- LDA #$14
- STA JUMP_FORCE
+ LDA JUMP_FORCE
  STA jump_force_cur
- LDA #$08
- STA GRAVITY_DELAY
+ LDA GRAVITY_DELAY
  STA gravity_delay_cur
- LDA #$E6
- STA DEATH_ZONE
  ; define Y position on init,sprite1,sprite2
- LDA #$B6
- STA INITIAL_POSITION_Y
+ LDA INITIAL_POSITION_Y
  STA Sprite1_Y
  STA Sprite2_Y
  ; define X position
- LDA #$40
- STA INITIAL_POSITION_X
+ LDA INITIAL_POSITION_X
  STA Sprite1_X
- LDA #$48
+ ADC #$08
  STA Sprite2_X
  ; define other sprite related variables
  LDA #$00
@@ -145,9 +146,6 @@ Loadnames:
  STA Sprite1_S
  LDA #%00000001 ; set the second palette for the second player
  STA Sprite2_S
- ; Screen scrolling
- STA Vertical_scroll
- STA Horizontal_scroll
  
 ; MAIN LOOP
 update:
@@ -180,23 +178,34 @@ WaitForVBlank:
  BNE WaitForVBlank
  DEC VBlankOrNo
  
- ; Register $2005 for scrolling
- LDA Horizontal_scroll
- STA $2005
- LDA Vertical_scroll
- STA $2005
- jmp update ; infinite loop
+ JSR ScrollingSeamRenderingCheck
+ ; LDA Horizontal_scroll
+ ; AND #%00000111
+ ; BNE skipDrawSeam
+ 
+;skipDrawSeam:
 
+ JSR ContinuousScroll
+ 
+ JSR CleanPPU
+ 
+ jmp update ; infinite loop
+ 
  .include "include/subroutines_gravity.asm"
  .include "include/subroutines_collision.asm"
+ .include "include/subroutines_rendering.asm"
  .include "include/subroutines.asm"
 
 ;; RESOURCES ;;
 palette:
  .incbin "palette.pal"
 ; Map and attributes need to be the next 255 bytes
-Map:
- .incbin "map.nam"
+Map0:
+ .incbin "map02.nam"
+ .incbin "map01.nam"
+ .incbin "map00.nam"
+ 
+ 
 ;Attributes:
  ;.incbin "map_attr.atr"
 

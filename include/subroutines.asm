@@ -8,7 +8,9 @@ VBlank_routine:
  STA $4014
  inc VBlankOrNo
  RTI
- 
+
+; Controls
+
 keypressed:
  LDA #$01
  STA JOYPAD1
@@ -56,9 +58,8 @@ ReadBButton:
  LDA JOYPAD1
  AND #1
  BEQ ReadABDone
- LDA Vertical_scroll
- ADC #1
- STA Vertical_scroll
+ SEC
+ DEC scroll
  JMP ReadABDone
  
 ReadABDone:
