@@ -210,7 +210,7 @@ WaitForVBlank:
 palette:
  .incbin "palette.pal"
 ; Map and attributes
-.include "include/metatiles.asm"
+ .include "include/metatiles.asm"
 
 BitMasks:
    .db %10000000

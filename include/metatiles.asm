@@ -4,7 +4,7 @@ MetaTileSeta01:
  .db $05,$05,$06,$06,$02,%00001111
  
 Map0:
- .word Map01, .word Map00
+ .dw Map01,Map00
  
 Map00:
  .db $8F,$7F
