@@ -30,7 +30,7 @@ CheckGround: ; Checkground subroutines
  JSR SetGrounded
 SkipCheckGround:
  RTS
- 
+
 CheckPixelCollision:
  ; detection of floor underneath both bottom hitbox
  ; X and Y_prime give the bottom-left hitbox

@@ -70,10 +70,10 @@ readupkey:
  LDA JOYPAD1
  AND #1
  BEQ readkeydone
- ; SEC
- ; LDA Sprite1_Y
- ; SBC #2
- ; STA Sprite1_Y
+ SEC
+ LDA test_y
+ SBC #1
+ STA test_y
  JMP readkeydone
  
 ; DOWN
@@ -81,11 +81,12 @@ readdownkey:
  LDA JOYPAD1
  AND #1
  BEQ readkeydone
- LDA #$01
- STA vertical_force
- ; LDA Sprite1_Y
- ; ADC #1
- ; STA Sprite1_Y
+ ;LDA #$01
+ ;STA vertical_force
+ CLC
+ LDA test_y
+ ADC #1
+ STA test_y
  JMP readkeydone
  
 ; LEFT
@@ -99,9 +100,9 @@ readleftkey:
  JSR CheckLeftCollision
  BNE readkeydone
  SEC
- LDA Sprite1_X
+ LDA test_x;LDA Sprite1_X
  SBC #1
- STA Sprite1_X
+ STA test_x;STA Sprite1_X
  JMP readkeydone
  
 ; RIGHT
@@ -115,16 +116,48 @@ readrightkey:
  JSR CheckRightCollision
  BNE readkeydone
  CLC
- LDA Sprite1_X
+ LDA test_x;LDA Sprite1_X
  ADC #1
- STA Sprite1_X
+ STA test_x;STA Sprite1_X
  JMP readkeydone
  
-nextkeyread:
- LDA JOYPAD1
- AND #1
- BEQ readkeydone
+readkeydone:
  RTS
  
-readkeydone:
+; PPU Routine
+LoadHighRow:
+ ; A register: 0 or 2
+ asl a
+ asl a 							; multiply by 4 to get 0 or 8
+ clc
+ adc #$20 						; add to 20 to get the high address $2000 or $2800
+ RTS
+
+RowMultiply:
+ ; A register: Vertical value
+ ; var1: HighRow value
+ LSR A
+ LSR A
+ LSR A							; divide by 8
+ TAX
+ LDA #$00
+RowMultiplyLoop:				; Multiply X value times 32 ( 32 tiles in one row)
+ CPX #$00						; Start by comparing if 0 then break out the loop immediatly
+ BEQ exitRowMultiplyLoop
+ CLC
+ ADC #$20
+ BCC skipIncHighRow				; if cycle back to 0 increase high_row address in Y
+ INC var1
+skipIncHighRow:
+ DEX
+ JMP RowMultiplyLoop
+exitRowMultiplyLoop:
+ RTS
+ 
+ADY:
+ CLC
+ ADC #$01
+ DEY
+ CPY #$00
+ BNE ADY
  RTS

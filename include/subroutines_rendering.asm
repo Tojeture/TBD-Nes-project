@@ -16,19 +16,19 @@ CleanPPU:
  LDA #%00011110
  STA $2001
  RTS
+ 
 ContinuousScroll:
  ; Register scrolling and swap nametable for continous scroll
  LDA scroll
  ;CMP #$FF
  BNE skipSwapNT
-SwapNtProcess:
+SwapNT:
  LDA swapEnabled
  BNE swapDone
  SEC
  LDA scroll
  SBC #$11
  STA scroll
-SwapNT:
  LDA nametable
  EOR #$02
  STA nametable
@@ -50,14 +50,9 @@ ScrollingSeamRenderingCheck:
  BNE skipWorldRowValueUpdate
  SEC
  DEC worldRowValue
- ; Swap nametable
- LDA nametable
- EOR #$02
- STA nametable
+ 
  JSR DrawNewRow
- LDA nametable
- EOR #$02
- STA nametable
+ 
  INC worldRowValueChanged
 skipWorldRowValueUpdate:
  RTS
@@ -68,51 +63,19 @@ skipSeamRenderingCheck:
  RTS
 ; Draw one row of tile based on address given
 DrawNewRow:
- lda nametable 					; should equal to 0 or 2
- EOR #$02
- asl a
- asl a 							; multiply by 4 to get 0 or 8
- clc
- adc #$20 						; add to 20 to get the high address $2000 or $2800
- sta high_row
+ LDA nametable
+ JSR LoadHighRow
+ STA high_row
+
  
- ; LDA scroll						; get scroll from 0 to 240 ( 240 is max for vertical scrolling)
- ; LSR A
- ; LSR A
- ; LSR A							; divide by 8 to get 0 to 29
- ; TAX
- ; BEQ skipMultiplyLoop
- ; LDA #$00
-; RowMultiplyLoop:				; Multiply X value times 32
- ; CLC
- ; ADC #$20
- ; BCC skipIncHighRow				; if cycle back to 0 increase high_row address
- ; INC high_row
-; skipIncHighRow:
- ; DEX
- ; BNE RowMultiplyLoop
-; skipMultiplyLoop:
- ; STA low_row					; finally store the value in low_row address to be used for rendering
+ LDA high_row
+ STA var1
+ LDA scroll
+ JSR RowMultiply
+ STA low_row
  
- LDA scroll						; get scroll from 0 to 240 ( 240 is max for vertical scrolling)
- LSR A
- LSR A
- LSR A							; divide by 8 to get 0 to 29
- TAX
- LDA #$00
-RowMultiplyLoop:				; Multiply X value times 32 ( 32 tiles in one row)
- CPX #$00						; Start by comparing if 0 then break out the loop immediatly
- BEQ exitRowMultiplyLoop
- CLC
- ADC #$20
- BCC skipIncHighRow				; if cycle back to 0 increase high_row address
- INC high_row
-skipIncHighRow:
- DEX
- JMP RowMultiplyLoop
-exitRowMultiplyLoop:
- STA low_row					; finally store the value in low_row address to be used for rendering
- 
+ LDA var1
+ STA high_row
  
  LDA worldRowValue				; Get row based on all map combine and calculate how far the source have to go to read a row
  ASL A 
@@ -153,3 +116,6 @@ DrawRowLoop:
  BNE DrawRowLoop
  
  RTS
+ 
+ 
+; TODO : set attributes with scroll

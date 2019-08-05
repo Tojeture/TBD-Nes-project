@@ -6,6 +6,7 @@
 
 ; Address Constant
 PPU_ADDR = $2006
+PPU_DATA = $2007
 JOYPAD1 = $4016
 JOYPAD2 = $4017
 
@@ -26,6 +27,7 @@ JOYPAD2 = $4017
  worldRowValue: .db 0
  worldRowValueChanged: .db 0
  nametable: .db 0
+ nametable_prime: .db 0
  columnNumber: .db 0
  low_ppu_addr: .db 0
  high_ppu_addr: .db 0
@@ -35,6 +37,7 @@ JOYPAD2 = $4017
  high_row: .db 0
  Temp_X: .db 0
  Temp_Y: .db 0
+ Temp_Y2: .db 0
  ; COLLISION
  Player_State: .db 0
  vertical_force: .db 0
@@ -47,6 +50,16 @@ JOYPAD2 = $4017
  Sprite1_Y_prime: .db 0
  ; SCROLL
  scroll: .db 0
+ scrollDifference: .db 0
+ ; Variables
+ var1: .db 0
+ var2: .db 0
+ var3: .db 0
+ ; TEST
+ test_x: .db 0
+ test_y: .db 0
+ test_y_prime: .db 0
+ test_result: .db 0
  .org $0300
  ;; OAM informations for sprite rendering
  ; Render info
@@ -94,7 +107,7 @@ loadpal:
  BNE loadpal
  
  ; INIT MAP
- LDA #$00
+ LDA #$02
  STA nametable
  LDA #$EF
  STA scroll
@@ -113,15 +126,12 @@ InitNametablesRendering:
  CMP #$3F
  BNE InitNametablesRendering
  ; Draw one more rows outside the screen in the buffering seam
- LDA #$02
+ LDA #$00
  STA nametable
  LDA #$EF
  STA scroll
+ SEC
  DEC worldRowValue
- DEC worldRowValue					;Decrease another because 23A0 to 23C0 is not drawn, instead it is used for something else
- JSR DrawNewRow
- LDA #$00
- STA nametable
  
  
  ; INIT VARIABLES
@@ -199,15 +209,8 @@ WaitForVBlank:
 ;; RESOURCES ;;
 palette:
  .incbin "palette.pal"
-; Map and attributes need to be the next 255 bytes
-Map0:
- .incbin "map02.nam"
- .incbin "map01.nam"
- .incbin "map00.nam"
- 
- 
-;Attributes:
- ;.incbin "map_attr.atr"
+; Map and attributes
+.include "include/metatiles.asm"
 
 BitMasks:
    .db %10000000
