@@ -132,27 +132,6 @@ LoadHighRow:
  clc
  adc #$20 						; add to 20 to get the high address $2000 or $2800
  RTS
-
-RowMultiply:
- ; A register: Vertical value
- ; var1: HighRow value
- LSR A
- LSR A
- LSR A							; divide by 8
- TAX
- LDA #$00
-RowMultiplyLoop:				; Multiply X value times 32 ( 32 tiles in one row)
- CPX #$00						; Start by comparing if 0 then break out the loop immediatly
- BEQ exitRowMultiplyLoop
- CLC
- ADC #$20
- BCC skipIncHighRow				; if cycle back to 0 increase high_row address in Y
- INC var1
-skipIncHighRow:
- DEX
- JMP RowMultiplyLoop
-exitRowMultiplyLoop:
- RTS
  
 ADY:
  CLC

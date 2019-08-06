@@ -23,22 +23,21 @@ JOYPAD2 = $4017
  .org $0000
  VBlankOrNo: .db 0
  ; RENDERING
- swapEnabled: .db 0
+ swapEnabled: .db 0				; BOOL
  worldRowValue: .db 0
- worldRowValueChanged: .db 0
+ worldRowValueChanged: .db 0	; BOOL
  nametable: .db 0
  nametable_prime: .db 0
  columnNumber: .db 0
- low_ppu_addr: .db 0
- high_ppu_addr: .db 0
  low_map: .db 0
  high_map: .db 0
  low_row: .db 0
  high_row: .db 0
- Temp_X: .db 0
- Temp_Y: .db 0
- Temp_Y2: .db 0
+ low_meta: .db 0
+ high_meta: .db 0
+ metatilesPointer: .db 0
  ; COLLISION
+ Temp_Y: .db 0
  Player_State: .db 0
  vertical_force: .db 0
  jump_force_cur: .db 0
@@ -111,27 +110,27 @@ loadpal:
  STA nametable
  LDA #$EF
  STA scroll
- LDA #$5D
+ LDA #$1F
  STA worldRowValue
  
 InitNametablesRendering:
  JSR DrawNewRow
- SEC
- LDA scroll
- SBC #$08
- STA scroll
+ ;SEC
+ ;LDA scroll
+ ;SBC #$08
+ ;STA scroll
  
- DEC worldRowValue
- LDA worldRowValue
- CMP #$3F
- BNE InitNametablesRendering
+ ;DEC worldRowValue
+ ;LDA worldRowValue
+ ;CMP #$3F
+ ;BNE InitNametablesRendering
  ; Draw one more rows outside the screen in the buffering seam
- LDA #$00
- STA nametable
+ ;LDA #$00
+ ;STA nametable
  LDA #$EF
  STA scroll
- SEC
- DEC worldRowValue
+ ;SEC
+ ;DEC worldRowValue
  
  
  ; INIT VARIABLES
@@ -205,6 +204,7 @@ WaitForVBlank:
  .include "include/subroutines_collision.asm"
  .include "include/subroutines_rendering.asm"
  .include "include/subroutines.asm"
+ .include "include/metatiles_rendering.asm"
 
 ;; RESOURCES ;;
 palette:
